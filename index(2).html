@@ -3,27 +3,33 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>QuickQuote — Professional Invoices & Quotes</title>
+<title>RateRight — Freelance Rate Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --cream: #FAF8F4;
-    --ink: #1A1916;
-    --ink-mid: #4A4845;
-    --ink-light: #9A9895;
-    --border: #E2DDD8;
-    --accent: #1D6B4A;
-    --accent-light: #E8F5EE;
-    --accent-mid: #2A8A5E;
-    --danger: #C0392B;
+    --cream: #F4F7FA;
+    --ink: #1A1C22;
+    --ink-mid: #454852;
+    --ink-light: #9298A8;
+    --border: #DDE2EC;
+    --accent: #2B4FBF;
+    --accent-light: #EBF0FF;
+    --accent-mid: #3D63D8;
+    --accent-glow: #6B8EF5;
     --surface: #FFFFFF;
-    --surface2: #F5F2EE;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --surface2: #F0F4FA;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
     --radius: 10px;
     --serif: 'DM Serif Display', serif;
     --sans: 'DM Sans', sans-serif;
+    --green: #1A7A4A;
+    --green-light: #E6F5EE;
+    --amber: #B45A00;
+    --amber-light: #FFF4E5;
+    --red: #C0392B;
+    --red-light: #FEF2F2;
   }
 
   body {
@@ -37,7 +43,7 @@
 
   /* NAV */
   nav {
-    background: var(--ink);
+    background: #1A1C22;
     color: white;
     padding: 0 2rem;
     height: 56px;
@@ -49,17 +55,17 @@
     z-index: 100;
   }
   .logo { font-family: var(--serif); font-size: 22px; letter-spacing: -0.3px; }
-  .logo span { color: #5DCAA5; }
+  .logo span { color: #6B8EF5; }
   .nav-actions { display: flex; gap: 10px; align-items: center; }
   .btn { font-family: var(--sans); cursor: pointer; border: none; border-radius: 7px; font-size: 14px; font-weight: 500; transition: all 0.15s; padding: 8px 18px; }
-  .btn-ghost { background: rgba(255,255,255,0.1); color: white; }
+  .btn-ghost { background: rgba(255,255,255,0.1); color: white; border: none; }
   .btn-ghost:hover { background: rgba(255,255,255,0.18); }
   .btn-primary { background: var(--accent); color: white; }
   .btn-primary:hover { background: var(--accent-mid); }
-  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; font-size: 12px; }
-  .btn-danger:hover { background: #FEF2F2; }
   .btn-outline { background: white; color: var(--ink); border: 1px solid var(--border); }
   .btn-outline:hover { border-color: var(--ink-mid); }
+  .kofi-btn { display: inline-flex; align-items: center; gap: 7px; background: #FF5E5B; color: white; font-family: var(--sans); font-size: 13px; font-weight: 600; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
+  .kofi-btn:hover { opacity: 0.88; }
 
   /* LAYOUT */
   .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
@@ -70,432 +76,439 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); }
   .card + .card { margin-top: 1.25rem; }
   .card-title { font-family: var(--serif); font-size: 18px; margin-bottom: 1.25rem; color: var(--ink); }
+  .card-subtitle { font-size: 13px; color: var(--ink-light); margin-top: -1rem; margin-bottom: 1.25rem; }
 
-  /* FORM ELEMENTS */
-  .field { margin-bottom: 1rem; }
-  .field label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); margin-bottom: 5px; }
-  .field input, .field select, .field textarea {
+  /* FORM */
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); margin-bottom: 5px; }
+  .field label span { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: none; letter-spacing: 0; }
+  .field input[type="number"], .field select {
     width: 100%; font-family: var(--sans); font-size: 14px; color: var(--ink);
     background: var(--cream); border: 1px solid var(--border); border-radius: 7px;
-    padding: 9px 12px; transition: border-color 0.15s;
-    outline: none;
+    padding: 9px 12px; transition: border-color 0.15s; outline: none;
   }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: white; }
-  .field textarea { resize: vertical; min-height: 80px; }
+  .field input[type="number"]:focus, .field select:focus { border-color: var(--accent); background: white; }
+
+  /* SLIDER */
+  .slider-wrap { position: relative; }
+  input[type="range"] {
+    width: 100%; height: 5px; border-radius: 3px; outline: none; border: none;
+    background: var(--border); cursor: pointer; appearance: none; -webkit-appearance: none;
+    accent-color: var(--accent);
+  }
+  input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid white; box-shadow: 0 0 0 1px var(--border); cursor: pointer; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-light); margin-top: 4px; }
+
   .two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .three-fields { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
 
-  /* BADGE */
-  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .badge-quote { background: #EEF2FF; color: #3730A3; }
-  .badge-invoice { background: var(--accent-light); color: var(--accent); }
+  /* PREFIX INPUT */
+  .input-prefix { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 7px; background: var(--cream); overflow: hidden; transition: border-color 0.15s; }
+  .input-prefix:focus-within { border-color: var(--accent); background: white; }
+  .input-prefix span { padding: 9px 10px 9px 12px; font-size: 14px; color: var(--ink-light); font-weight: 500; background: var(--surface2); border-right: 1px solid var(--border); }
+  .input-prefix input { flex: 1; border: none; background: transparent; font-family: var(--sans); font-size: 14px; color: var(--ink); padding: 9px 12px; outline: none; }
 
-  /* LINE ITEMS */
-  .items-header { display: grid; grid-template-columns: 2fr 1fr 1fr 36px; gap: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-  .line-item { display: grid; grid-template-columns: 2fr 1fr 1fr 36px; gap: 10px; align-items: center; margin-bottom: 8px; }
-  .line-item input { font-size: 14px; }
-  .remove-btn { width: 30px; height: 30px; border: none; background: none; color: var(--ink-light); cursor: pointer; font-size: 18px; border-radius: 5px; display: flex; align-items: center; justify-content: center; transition: all 0.1s; }
-  .remove-btn:hover { background: #FEE2E2; color: var(--danger); }
-  .add-item-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1.5px dashed var(--border); color: var(--ink-light); font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; padding: 8px 14px; border-radius: 7px; width: 100%; justify-content: center; margin-top: 10px; transition: all 0.15s; }
-  .add-item-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  /* RESULT PANEL */
+  .result-panel { background: var(--ink); color: white; border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); }
+  .result-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+  .result-rate { font-family: var(--serif); font-size: 52px; line-height: 1; color: white; margin-bottom: 4px; }
+  .result-rate span { font-size: 22px; opacity: 0.6; }
+  .result-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .result-card { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 12px; }
+  .result-card-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .result-card-value { font-size: 18px; font-weight: 600; color: white; }
+  .result-card-value.positive { color: #5DCAA5; }
 
-  /* TOTALS */
-  .totals { background: var(--surface2); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1rem; }
-  .totals-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--ink-mid); }
-  .totals-row.total { font-size: 17px; font-weight: 600; color: var(--ink); border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
-  .totals-row.total span:last-child { font-family: var(--serif); font-size: 20px; }
+  /* BREAKDOWN BAR */
+  .breakdown { margin-bottom: 1.5rem; }
+  .breakdown-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+  .bar-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 10px; display: flex; }
+  .bar-seg { height: 100%; transition: width 0.4s ease; }
+  .bar-seg.salary { background: #6B8EF5; }
+  .bar-seg.tax { background: #F5A623; }
+  .bar-seg.expenses { background: #E05A5A; }
+  .bar-seg.buffer { background: #5DCAA5; }
+  .bar-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.6); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* PREVIEW PANEL */
-  .preview-sticky { position: sticky; top: 72px; }
-  .preview-doc { background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .preview-header { background: var(--ink); color: white; padding: 1.5rem; }
-  .preview-logo { font-family: var(--serif); font-size: 20px; margin-bottom: 0.25rem; }
-  .preview-tagline { font-size: 12px; opacity: 0.5; }
-  .preview-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1.25rem; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 12px; }
-  .preview-meta-block p:first-child { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); margin-bottom: 3px; }
-  .preview-meta-block p { color: var(--ink-mid); }
-  .preview-body { padding: 1.25rem; }
-  .preview-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .preview-table th { text-align: left; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-light); padding: 0 6px 8px; border-bottom: 1px solid var(--border); }
-  .preview-table th:last-child, .preview-table td:last-child { text-align: right; }
-  .preview-table td { padding: 7px 6px; color: var(--ink-mid); border-bottom: 1px solid var(--surface2); }
-  .preview-totals { margin-top: 1rem; }
-  .preview-total-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-mid); padding: 3px 0; }
-  .preview-total-row.final { font-weight: 600; font-size: 15px; color: var(--ink); border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; }
-  .preview-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--ink-light); }
-  .preview-actions { display: flex; gap: 8px; padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
-  .preview-actions .btn { flex: 1; text-align: center; font-size: 13px; }
+  /* HEALTH BADGE */
+  .health-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; margin-bottom: 1.25rem; }
+  .health-good { background: rgba(93,202,165,0.15); color: #5DCAA5; }
+  .health-ok { background: rgba(245,166,35,0.15); color: #F5A623; }
+  .health-low { background: rgba(224,90,90,0.15); color: #E05A5A; }
 
-  /* TYPE TOGGLE */
-  .type-toggle { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 1.5rem; }
-  .type-btn { flex: 1; padding: 7px; border: none; background: none; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 6px; color: var(--ink-mid); transition: all 0.15s; }
-  .type-btn.active { background: white; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  /* TIPS */
+  .tips { background: var(--accent-light); border: 1px solid #C5D4FF; border-radius: 8px; padding: 1rem 1.25rem; }
+  .tips-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 8px; }
+  .tip { font-size: 13px; color: var(--ink-mid); padding: 4px 0; border-bottom: 1px solid #D8E3FF; }
+  .tip:last-child { border-bottom: none; }
+  .tip strong { color: var(--accent); }
+
+  /* SHARE */
+  .share-row { display: flex; gap: 8px; }
+  .share-row .btn { flex: 1; font-size: 13px; text-align: center; }
 
   /* HERO */
   .hero { text-align: center; padding: 3rem 1rem 2rem; }
-  .hero h1 { font-family: var(--serif); font-size: clamp(32px, 5vw, 52px); color: var(--ink); line-height: 1.15; margin-bottom: 0.75rem; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(30px, 5vw, 50px); color: var(--ink); line-height: 1.15; margin-bottom: 0.75rem; }
   .hero p { color: var(--ink-mid); font-size: 16px; max-width: 520px; margin: 0 auto 2rem; }
   .hero-badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
   .hero-badge { font-size: 12px; font-weight: 500; color: var(--ink-mid); background: white; border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; }
 
-  /* PRINT / PDF styles */
+  /* CROSS PROMO */
+  .cross-promo { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; }
+  .cross-promo p { font-size: 13px; color: var(--ink-mid); }
+  .cross-promo strong { color: var(--ink); display: block; font-size: 14px; margin-bottom: 2px; }
+  .cross-promo a { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .cross-promo a:hover { text-decoration: underline; }
+
   @media print {
-    nav, .form-col, .preview-actions, .hero { display: none !important; }
+    nav, .form-col, .share-row, .hero, .cross-promo, .tips { display: none !important; }
     body { background: white; }
     .two-col { display: block; }
-    .preview-sticky { position: static; }
-    .preview-doc { border: none; box-shadow: none; }
-    .container { padding: 0; max-width: 100%; }
+    .result-panel { color: black; background: white; border: 1px solid #ccc; }
   }
-
-  .section-divider { height: 1px; background: var(--border); margin: 2rem 0; }
-  .kofi-btn { display: inline-flex; align-items: center; gap: 7px; background: #FF5E5B; color: white; font-family: var(--sans); font-size: 13px; font-weight: 600; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: opacity 0.15s; }
-  .kofi-btn:hover { opacity: 0.88; }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">Quick<span>Quote</span></div>
+  <div class="logo">Rate<span>Right</span></div>
   <div class="nav-actions">
     <a class="kofi-btn" href="https://ko-fi.com/jschm" target="_blank">☕ Buy me a coffee</a>
-    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
-    <button class="btn btn-primary" onclick="printDoc()">Export PDF</button>
+    <button class="btn btn-ghost" onclick="resetAll()">Reset</button>
   </div>
 </nav>
 
 <div class="container">
   <div class="hero">
-    <h1>Professional quotes &<br/>invoices in seconds</h1>
-    <p>Fill in your details below and get a beautiful, print-ready document instantly — no sign-up needed.</p>
+    <h1>What should you charge<br/>as a freelancer?</h1>
+    <p>Enter your financial goals and working style — get your ideal hourly rate in seconds, with a full breakdown.</p>
     <div class="hero-badges">
-      <span class="hero-badge">✓ Free to use</span>
-      <span class="hero-badge">✓ Instant PDF export</span>
-      <span class="hero-badge">✓ Looks professional</span>
-      <span class="hero-badge">✓ No account needed</span>
+      <span class="hero-badge">✓ Free forever</span>
+      <span class="hero-badge">✓ Takes 60 seconds</span>
+      <span class="hero-badge">✓ Covers tax & expenses</span>
+      <span class="hero-badge">✓ No sign-up needed</span>
     </div>
   </div>
 
   <div class="two-col">
-    <!-- FORM COLUMN -->
+    <!-- FORM -->
     <div class="form-col">
 
-      <!-- Doc type -->
       <div class="card">
-        <div class="type-toggle">
-          <button class="type-btn active" id="toggle-quote" onclick="setType('quote')">Quote / Estimate</button>
-          <button class="type-btn" id="toggle-invoice" onclick="setType('invoice')">Invoice</button>
+        <div class="card-title">Your Income Goal</div>
+        <div class="card-subtitle">How much do you want to take home?</div>
+
+        <div class="field">
+          <label>Desired Annual Salary <span id="salary-out">$60,000</span></label>
+          <input type="range" id="salary" min="20000" max="300000" step="1000" value="60000" oninput="update()" />
+          <div class="slider-labels"><span>$20k</span><span>$300k</span></div>
         </div>
 
         <div class="two-fields">
           <div class="field">
-            <label>Document Number</label>
-            <input type="text" id="doc-number" value="001" oninput="updatePreview()" />
+            <label>Currency</label>
+            <select id="currency" onchange="update()">
+              <option value="$">USD ($)</option>
+              <option value="£">GBP (£)</option>
+              <option value="€">EUR (€)</option>
+              <option value="CA$">CAD (CA$)</option>
+              <option value="AU$">AUD (AU$)</option>
+            </select>
           </div>
           <div class="field">
-            <label id="date-label">Quote Date</label>
-            <input type="date" id="doc-date" oninput="updatePreview()" />
+            <label>Country / Tax Rate</label>
+            <select id="taxpreset" onchange="applyTax()">
+              <option value="25">USA (~25%)</option>
+              <option value="20">UK (~20%)</option>
+              <option value="30">Canada (~30%)</option>
+              <option value="33">Australia (~33%)</option>
+              <option value="35">Germany (~35%)</option>
+              <option value="custom">Custom</option>
+            </select>
           </div>
         </div>
-        <div class="field" id="due-date-field">
-          <label>Payment Due Date</label>
-          <input type="date" id="due-date" oninput="updatePreview()" />
+
+        <div class="field" id="custom-tax-field" style="display:none;">
+          <label>Custom Tax Rate <span id="tax-out">25%</span></label>
+          <input type="range" id="taxrate" min="0" max="60" step="1" value="25" oninput="update()" />
+          <div class="slider-labels"><span>0%</span><span>60%</span></div>
         </div>
       </div>
 
-      <!-- Your business -->
       <div class="card">
-        <div class="card-title">Your Business</div>
+        <div class="card-title">Your Working Style</div>
+        <div class="card-subtitle">Be honest — this is what makes the rate accurate.</div>
+
         <div class="field">
-          <label>Business Name</label>
-          <input type="text" id="biz-name" placeholder="Acme Services LLC" oninput="updatePreview()" />
+          <label>Billable weeks per year <span id="weeks-out">46 weeks</span></label>
+          <input type="range" id="weeks" min="20" max="52" step="1" value="46" oninput="update()" />
+          <div class="slider-labels"><span>20 wks</span><span>52 wks</span></div>
+        </div>
+
+        <div class="field">
+          <label>Billable hours per week <span id="hours-out">30 hrs</span></label>
+          <input type="range" id="hours" min="5" max="60" step="1" value="30" oninput="update()" />
+          <div class="slider-labels"><span>5 hrs</span><span>60 hrs</span></div>
+        </div>
+
+        <div class="field">
+          <label>Unpaid time (admin, sales, etc.) <span id="overhead-out">20%</span></label>
+          <input type="range" id="overhead" min="0" max="60" step="5" value="20" oninput="update()" />
+          <div class="slider-labels"><span>0%</span><span>60%</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Business Expenses</div>
+        <div class="card-subtitle">Annual costs your rate needs to cover.</div>
+
+        <div class="two-fields">
+          <div class="field">
+            <label>Software & Tools</label>
+            <div class="input-prefix"><span id="cur1">$</span><input type="number" id="exp-software" value="1200" min="0" oninput="update()" /></div>
+          </div>
+          <div class="field">
+            <label>Equipment</label>
+            <div class="input-prefix"><span id="cur2">$</span><input type="number" id="exp-equipment" value="500" min="0" oninput="update()" /></div>
+          </div>
         </div>
         <div class="two-fields">
           <div class="field">
-            <label>Email</label>
-            <input type="email" id="biz-email" placeholder="you@yourcompany.com" oninput="updatePreview()" />
+            <label>Insurance</label>
+            <div class="input-prefix"><span id="cur3">$</span><input type="number" id="exp-insurance" value="600" min="0" oninput="update()" /></div>
           </div>
           <div class="field">
-            <label>Phone</label>
-            <input type="tel" id="biz-phone" placeholder="+1 (555) 000-0000" oninput="updatePreview()" />
+            <label>Marketing</label>
+            <div class="input-prefix"><span id="cur4">$</span><input type="number" id="exp-marketing" value="400" min="0" oninput="update()" /></div>
           </div>
         </div>
         <div class="field">
-          <label>Address</label>
-          <input type="text" id="biz-address" placeholder="123 Main St, City, State ZIP" oninput="updatePreview()" />
+          <label>Other Annual Expenses</label>
+          <div class="input-prefix"><span id="cur5">$</span><input type="number" id="exp-other" value="0" min="0" oninput="update()" /></div>
         </div>
       </div>
 
-      <!-- Client -->
       <div class="card">
-        <div class="card-title">Client Details</div>
+        <div class="card-title">Safety Buffer</div>
+        <div class="card-subtitle">Extra padding for slow months, late payers, and emergencies.</div>
         <div class="field">
-          <label>Client Name / Company</label>
-          <input type="text" id="client-name" placeholder="Jane Smith / Acme Corp" oninput="updatePreview()" />
-        </div>
-        <div class="field">
-          <label>Client Email</label>
-          <input type="email" id="client-email" placeholder="client@email.com" oninput="updatePreview()" />
-        </div>
-        <div class="field">
-          <label>Client Address</label>
-          <input type="text" id="client-address" placeholder="456 Oak Ave, City, State ZIP" oninput="updatePreview()" />
-        </div>
-      </div>
-
-      <!-- Line items -->
-      <div class="card">
-        <div class="card-title">Line Items</div>
-        <div class="items-header">
-          <span>Description</span>
-          <span>Qty</span>
-          <span>Price</span>
-          <span></span>
-        </div>
-        <div id="line-items"></div>
-        <button class="add-item-btn" onclick="addItem()">+ Add line item</button>
-
-        <div class="totals">
-          <div class="totals-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
-          <div class="totals-row" id="tax-row">
-            <span>Tax (<input type="number" id="tax-rate" value="0" min="0" max="100" step="0.5" style="width:44px;padding:1px 5px;font-size:13px;border-radius:4px;border:1px solid var(--border);" oninput="updatePreview()" />%)</span>
-            <span id="tax-amount">$0.00</span>
-          </div>
-          <div class="totals-row" id="discount-row">
-            <span>Discount (<input type="number" id="disc-rate" value="0" min="0" max="100" step="1" style="width:44px;padding:1px 5px;font-size:13px;border-radius:4px;border:1px solid var(--border);" oninput="updatePreview()" />%)</span>
-            <span id="disc-amount">-$0.00</span>
-          </div>
-          <div class="totals-row total"><span>Total Due</span><span id="total">$0.00</span></div>
-        </div>
-      </div>
-
-      <!-- Notes -->
-      <div class="card">
-        <div class="card-title">Notes & Terms</div>
-        <div class="field">
-          <label>Notes to Client</label>
-          <textarea id="notes" placeholder="Thank you for your business! Payment via bank transfer, PayPal, or check." oninput="updatePreview()"></textarea>
+          <label>Buffer <span id="buffer-out">15%</span></label>
+          <input type="range" id="buffer" min="0" max="50" step="5" value="15" oninput="update()" />
+          <div class="slider-labels"><span>0% (risky)</span><span>50% (safe)</span></div>
         </div>
       </div>
 
     </div>
 
-    <!-- PREVIEW COLUMN -->
-    <div class="preview-sticky">
-      <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink-light);margin-bottom:10px;">Live Preview</p>
-      <div class="preview-doc" id="preview-doc">
+    <!-- RESULT PANEL -->
+    <div style="position:sticky;top:72px;">
+      <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink-light);margin-bottom:10px;">Your Rate</p>
 
-        <div class="preview-header">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div>
-              <div class="preview-logo" id="prev-biz-name">Your Business</div>
-              <div class="preview-tagline" id="prev-biz-contact"></div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:20px;font-family:'DM Serif Display',serif;letter-spacing:-0.3px;" id="prev-doc-type">QUOTE</div>
-              <div style="font-size:12px;opacity:0.6;" id="prev-doc-num">#001</div>
-            </div>
+      <div class="result-panel">
+        <div class="result-label">Recommended Hourly Rate</div>
+        <div class="result-rate" id="result-rate"><span id="result-cur">$</span><span id="result-num">--</span></div>
+        <div class="result-sub" id="result-sub">per billable hour</div>
+
+        <div id="health-badge" class="health-badge health-good">&#10003; Healthy rate</div>
+
+        <div class="result-grid">
+          <div class="result-card">
+            <div class="result-card-label">Daily Rate</div>
+            <div class="result-card-value" id="result-day">--</div>
+          </div>
+          <div class="result-card">
+            <div class="result-card-label">Monthly Target</div>
+            <div class="result-card-value" id="result-month">--</div>
+          </div>
+          <div class="result-card">
+            <div class="result-card-label">Billable Hours/yr</div>
+            <div class="result-card-value" id="result-billable">--</div>
+          </div>
+          <div class="result-card">
+            <div class="result-card-label">Total Revenue Needed</div>
+            <div class="result-card-value positive" id="result-revenue">--</div>
           </div>
         </div>
 
-        <div class="preview-meta">
-          <div class="preview-meta-block">
-            <p>Billed To</p>
-            <p id="prev-client-name">—</p>
-            <p id="prev-client-email"></p>
-            <p id="prev-client-addr"></p>
+        <div class="breakdown">
+          <div class="breakdown-title">What your rate covers</div>
+          <div class="bar-track">
+            <div class="bar-seg salary" id="bar-salary"></div>
+            <div class="bar-seg tax" id="bar-tax"></div>
+            <div class="bar-seg expenses" id="bar-expenses"></div>
+            <div class="bar-seg buffer" id="bar-buffer"></div>
           </div>
-          <div class="preview-meta-block" style="text-align:right;">
-            <p id="prev-date-label">Quote Date</p>
-            <p id="prev-date">—</p>
-            <p id="prev-due-label" style="margin-top:8px;"></p>
-            <p id="prev-due"></p>
+          <div class="bar-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#6B8EF5"></div><span id="leg-salary">Salary</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#F5A623"></div><span id="leg-tax">Tax</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#E05A5A"></div><span id="leg-expenses">Expenses</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div><span id="leg-buffer">Buffer</span></div>
           </div>
         </div>
 
-        <div class="preview-body">
-          <table class="preview-table">
-            <thead>
-              <tr>
-                <th style="width:50%">Description</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody id="prev-items">
-              <tr><td colspan="4" style="color:var(--ink-light);text-align:center;padding:16px 0;font-size:12px;">Add line items to get started</td></tr>
-            </tbody>
-          </table>
-
-          <div class="preview-totals">
-            <div class="preview-total-row"><span>Subtotal</span><span id="prev-subtotal">$0.00</span></div>
-            <div class="preview-total-row" id="prev-tax-row"><span id="prev-tax-label">Tax (0%)</span><span id="prev-tax">$0.00</span></div>
-            <div class="preview-total-row" id="prev-disc-row"><span id="prev-disc-label">Discount (0%)</span><span id="prev-disc">-$0.00</span></div>
-            <div class="preview-total-row final"><span>Total</span><span id="prev-total">$0.00</span></div>
-          </div>
-
-          <div id="prev-notes" style="margin-top:1rem;font-size:11px;color:var(--ink-light);border-top:1px solid var(--border);padding-top:10px;"></div>
+        <div class="share-row">
+          <button class="btn btn-outline" onclick="copyRate()" style="background:rgba(255,255,255,0.08);color:white;border-color:rgba(255,255,255,0.15);">Copy Result</button>
+          <button class="btn btn-primary" onclick="window.print()">Save as PDF</button>
         </div>
-
-        <div class="preview-actions">
-          <button class="btn btn-outline" onclick="copyLink()" style="font-size:13px;">Copy Link</button>
-          <button class="btn btn-primary" onclick="printDoc()" style="font-size:13px;flex:2;">Export PDF</button>
-        </div>
-
       </div>
+
+      <div class="tips" style="margin-top:1.25rem;">
+        <div class="tips-title">💡 Rate Tips</div>
+        <div id="tips-content"></div>
+      </div>
+
+      <div class="cross-promo">
+        <div>
+          <strong>Ready to send your first invoice?</strong>
+          <p>Use our free invoice generator to bill clients professionally.</p>
+        </div>
+        <a href="https://invoicequote.store" target="_blank">Try it free →</a>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script>
-let docType = 'quote';
-let items = [];
-let itemId = 0;
+function fmt(n, cur) { return (cur || '$') + Math.round(n).toLocaleString(); }
 
-function setType(type) {
-  docType = type;
-  document.getElementById('toggle-quote').classList.toggle('active', type === 'quote');
-  document.getElementById('toggle-invoice').classList.toggle('active', type === 'invoice');
-  document.getElementById('date-label').textContent = type === 'quote' ? 'Quote Date' : 'Invoice Date';
-  document.getElementById('due-date-field').style.display = type === 'invoice' ? 'block' : 'none';
-  updatePreview();
-}
-
-function addItem(desc='', qty=1, price=0) {
-  const id = ++itemId;
-  items.push({ id, desc, qty, price });
-  renderItems();
-  updatePreview();
-}
-
-function removeItem(id) {
-  items = items.filter(i => i.id !== id);
-  renderItems();
-  updatePreview();
-}
-
-function renderItems() {
-  const container = document.getElementById('line-items');
-  container.innerHTML = '';
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'line-item';
-    div.innerHTML = `
-      <input type="text" placeholder="Description of service or product" value="${item.desc}" oninput="updateItem(${item.id},'desc',this.value)" />
-      <input type="number" min="1" value="${item.qty}" oninput="updateItem(${item.id},'qty',this.value)" />
-      <input type="number" min="0" step="0.01" placeholder="0.00" value="${item.price || ''}" oninput="updateItem(${item.id},'price',this.value)" />
-      <button class="remove-btn" onclick="removeItem(${item.id})">×</button>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function updateItem(id, field, value) {
-  const item = items.find(i => i.id === id);
-  if (!item) return;
-  if (field === 'qty' || field === 'price') item[field] = parseFloat(value) || 0;
-  else item[field] = value;
-  updatePreview();
-}
-
-function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-function fmtDate(d) { if (!d) return '—'; const [y,m,day] = d.split('-'); return `${m}/${day}/${y}`; }
-
-function updatePreview() {
-  const subtotal = items.reduce((s, i) => s + (i.qty * i.price), 0);
-  const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
-  const discRate = parseFloat(document.getElementById('disc-rate').value) || 0;
-  const taxAmt = subtotal * taxRate / 100;
-  const discAmt = subtotal * discRate / 100;
-  const total = subtotal + taxAmt - discAmt;
-
-  document.getElementById('subtotal').textContent = fmt(subtotal);
-  document.getElementById('tax-amount').textContent = fmt(taxAmt);
-  document.getElementById('disc-amount').textContent = '-' + fmt(discAmt);
-  document.getElementById('total').textContent = fmt(total);
-
-  const bizName = document.getElementById('biz-name').value || 'Your Business';
-  const bizEmail = document.getElementById('biz-email').value;
-  const bizPhone = document.getElementById('biz-phone').value;
-  const bizAddr = document.getElementById('biz-address').value;
-  const clientName = document.getElementById('client-name').value;
-  const clientEmail = document.getElementById('client-email').value;
-  const clientAddr = document.getElementById('client-address').value;
-  const docNum = document.getElementById('doc-number').value || '001';
-  const docDate = document.getElementById('doc-date').value;
-  const dueDate = document.getElementById('due-date').value;
-  const notes = document.getElementById('notes').value;
-
-  document.getElementById('prev-biz-name').textContent = bizName;
-  const contact = [bizEmail, bizPhone, bizAddr].filter(Boolean).join(' · ');
-  document.getElementById('prev-biz-contact').textContent = contact;
-  document.getElementById('prev-doc-type').textContent = docType.toUpperCase();
-  document.getElementById('prev-doc-num').textContent = '#' + docNum;
-  document.getElementById('prev-client-name').textContent = clientName || '—';
-  document.getElementById('prev-client-email').textContent = clientEmail;
-  document.getElementById('prev-client-addr').textContent = clientAddr;
-  document.getElementById('prev-date-label').textContent = docType === 'quote' ? 'Quote Date' : 'Invoice Date';
-  document.getElementById('prev-date').textContent = fmtDate(docDate);
-  document.getElementById('prev-due-label').textContent = docType === 'invoice' ? 'Due Date' : '';
-  document.getElementById('prev-due').textContent = docType === 'invoice' ? fmtDate(dueDate) : '';
-
-  const tbody = document.getElementById('prev-items');
-  if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-light);text-align:center;padding:16px 0;font-size:12px;">Add line items to get started</td></tr>';
+function applyTax() {
+  const sel = document.getElementById('taxpreset').value;
+  const customField = document.getElementById('custom-tax-field');
+  if (sel === 'custom') {
+    customField.style.display = 'block';
   } else {
-    tbody.innerHTML = items.map(i => `
-      <tr>
-        <td>${i.desc || '—'}</td>
-        <td>${i.qty}</td>
-        <td>${fmt(i.price)}</td>
-        <td>${fmt(i.qty * i.price)}</td>
-      </tr>
-    `).join('');
+    customField.style.display = 'none';
+    document.getElementById('taxrate').value = sel;
+  }
+  update();
+}
+
+function update() {
+  const cur = document.getElementById('currency').value;
+  const salary = parseInt(document.getElementById('salary').value);
+  const taxPreset = document.getElementById('taxpreset').value;
+  const taxRate = taxPreset === 'custom'
+    ? parseInt(document.getElementById('taxrate').value)
+    : parseInt(taxPreset);
+  const weeks = parseInt(document.getElementById('weeks').value);
+  const hoursPerWeek = parseInt(document.getElementById('hours').value);
+  const overhead = parseInt(document.getElementById('overhead').value);
+  const buffer = parseInt(document.getElementById('buffer').value);
+
+  const expSoftware = parseFloat(document.getElementById('exp-software').value) || 0;
+  const expEquip = parseFloat(document.getElementById('exp-equipment').value) || 0;
+  const expInsurance = parseFloat(document.getElementById('exp-insurance').value) || 0;
+  const expMarketing = parseFloat(document.getElementById('exp-marketing').value) || 0;
+  const expOther = parseFloat(document.getElementById('exp-other').value) || 0;
+  const totalExpenses = expSoftware + expEquip + expInsurance + expMarketing + expOther;
+
+  // Update slider labels
+  document.getElementById('salary-out').textContent = fmt(salary, '$');
+  document.getElementById('tax-out').textContent = taxRate + '%';
+  document.getElementById('weeks-out').textContent = weeks + ' weeks';
+  document.getElementById('hours-out').textContent = hoursPerWeek + ' hrs';
+  document.getElementById('overhead-out').textContent = overhead + '%';
+  document.getElementById('buffer-out').textContent = buffer + '%';
+
+  // Update currency symbols
+  ['cur1','cur2','cur3','cur4','cur5'].forEach(id => document.getElementById(id).textContent = cur);
+  document.getElementById('result-cur').textContent = cur;
+
+  // Calculations
+  const grossSalaryNeeded = salary / (1 - taxRate / 100);
+  const taxAmount = grossSalaryNeeded - salary;
+  const baseNeeded = grossSalaryNeeded + totalExpenses;
+  const withBuffer = baseNeeded * (1 + buffer / 100);
+
+  const effectiveHoursPerWeek = hoursPerWeek * (1 - overhead / 100);
+  const totalBillableHours = Math.round(weeks * effectiveHoursPerWeek);
+  const hourlyRate = totalBillableHours > 0 ? withBuffer / totalBillableHours : 0;
+  const dailyRate = hourlyRate * effectiveHoursPerWeek / 5;
+  const monthlyTarget = withBuffer / 12;
+
+  // Display
+  document.getElementById('result-num').textContent = Math.round(hourlyRate).toLocaleString();
+  document.getElementById('result-day').textContent = fmt(dailyRate, cur);
+  document.getElementById('result-month').textContent = fmt(monthlyTarget, cur);
+  document.getElementById('result-billable').textContent = totalBillableHours.toLocaleString() + ' hrs';
+  document.getElementById('result-revenue').textContent = fmt(withBuffer, cur);
+
+  // Breakdown bar
+  const total = withBuffer;
+  const salaryPct = (salary / total * 100).toFixed(1);
+  const taxPct = (taxAmount / total * 100).toFixed(1);
+  const expPct = (totalExpenses / total * 100).toFixed(1);
+  const bufPct = ((withBuffer - baseNeeded) / total * 100).toFixed(1);
+
+  document.getElementById('bar-salary').style.width = salaryPct + '%';
+  document.getElementById('bar-tax').style.width = taxPct + '%';
+  document.getElementById('bar-expenses').style.width = expPct + '%';
+  document.getElementById('bar-buffer').style.width = bufPct + '%';
+
+  document.getElementById('leg-salary').textContent = `Take-home (${salaryPct}%)`;
+  document.getElementById('leg-tax').textContent = `Tax (${taxPct}%)`;
+  document.getElementById('leg-expenses').textContent = `Expenses (${expPct}%)`;
+  document.getElementById('leg-buffer').textContent = `Buffer (${bufPct}%)`;
+
+  // Health badge
+  const badge = document.getElementById('health-badge');
+  if (hourlyRate < 25) {
+    badge.className = 'health-badge health-low';
+    badge.textContent = '⚠ Rate may be too low';
+  } else if (hourlyRate < 50) {
+    badge.className = 'health-badge health-ok';
+    badge.textContent = '~ Moderate rate';
+  } else {
+    badge.className = 'health-badge health-good';
+    badge.textContent = '✓ Healthy rate';
   }
 
-  document.getElementById('prev-subtotal').textContent = fmt(subtotal);
-  document.getElementById('prev-tax-label').textContent = `Tax (${taxRate}%)`;
-  document.getElementById('prev-tax').textContent = fmt(taxAmt);
-  document.getElementById('prev-disc-label').textContent = `Discount (${discRate}%)`;
-  document.getElementById('prev-disc').textContent = '-' + fmt(discAmt);
-  document.getElementById('prev-total').textContent = fmt(total);
-  document.getElementById('prev-tax-row').style.opacity = taxRate > 0 ? '1' : '0.4';
-  document.getElementById('prev-disc-row').style.opacity = discRate > 0 ? '1' : '0.4';
-  document.getElementById('prev-notes').textContent = notes;
+  // Tips
+  const tips = [];
+  if (overhead > 30) tips.push(`<div class="tip">You're spending <strong>${overhead}%</strong> on non-billable work — consider raising your rate or streamlining admin.</div>`);
+  if (buffer < 10) tips.push(`<div class="tip">A buffer under 10% is risky — late-paying clients could leave you short.</div>`);
+  if (weeks > 48) tips.push(`<div class="tip">Working <strong>${weeks} weeks</strong> a year leaves little room for sick days or holidays — consider building in more downtime.</div>`);
+  if (totalExpenses < 500) tips.push(`<div class="tip">Your expenses look low — don't forget to factor in software subscriptions, equipment, and insurance.</div>`);
+  if (tips.length === 0) tips.push(`<div class="tip">Your setup looks solid! Remember to review your rate every 6 months as your experience grows.</div>`);
+  tips.push(`<div class="tip">Once you know your rate, <strong>always quote before starting work</strong> — use our free invoice tool at invoicequote.store.</div>`);
+  document.getElementById('tips-content').innerHTML = tips.join('');
 }
 
-function printDoc() {
-  window.print();
-}
-
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href).then(() => {
+function copyRate() {
+  const cur = document.getElementById('currency').value;
+  const rate = document.getElementById('result-num').textContent;
+  const daily = document.getElementById('result-day').textContent;
+  const monthly = document.getElementById('result-month').textContent;
+  const text = `My freelance rate: ${cur}${rate}/hr | ${daily}/day | ${monthly}/mo — calculated at freelancerate.store`;
+  navigator.clipboard.writeText(text).then(() => {
     const btn = event.target;
     btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy Link', 2000);
+    setTimeout(() => btn.textContent = 'Copy Result', 2000);
   });
 }
 
-function clearAll() {
-  if (!confirm('Clear all fields and start over?')) return;
-  document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(el => el.value = '');
-  document.getElementById('doc-number').value = '001';
-  document.getElementById('tax-rate').value = '0';
-  document.getElementById('disc-rate').value = '0';
-  items = []; itemId = 0;
-  renderItems();
-  updatePreview();
+function resetAll() {
+  document.getElementById('salary').value = 60000;
+  document.getElementById('taxpreset').value = '25';
+  document.getElementById('taxrate').value = 25;
+  document.getElementById('weeks').value = 46;
+  document.getElementById('hours').value = 30;
+  document.getElementById('overhead').value = 20;
+  document.getElementById('buffer').value = 15;
+  document.getElementById('exp-software').value = 1200;
+  document.getElementById('exp-equipment').value = 500;
+  document.getElementById('exp-insurance').value = 600;
+  document.getElementById('exp-marketing').value = 400;
+  document.getElementById('exp-other').value = 0;
+  document.getElementById('custom-tax-field').style.display = 'none';
+  update();
 }
 
-// Init
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('doc-date').value = today;
-const due = new Date(); due.setDate(due.getDate() + 30);
-document.getElementById('due-date').value = due.toISOString().split('T')[0];
-document.getElementById('due-date-field').style.display = 'none';
-addItem('', 1, 0);
-updatePreview();
+update();
 </script>
 </body>
 </html>
